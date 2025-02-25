@@ -20,6 +20,8 @@ const COINSIZE = 10;
 const COIN_TIMEOUT = 2000;
 var coin;
 
+var gameState = "play";
+
 function setup() {
 	console.log("setup: ");
 
@@ -27,9 +29,11 @@ function setup() {
     player = new Sprite(100, 100, playerSize, playerSize);
     player.color = 'purple';
 
-    createCoin();
+	coins = new Group();
 
-    player.collides(coin, getPoint);
+    coins.add(createCoin());
+
+    player.collides(coins, getPoint);
     function getPoint(collider1, collider2) {
         collider2.remove();
         score++;
@@ -40,18 +44,58 @@ function setup() {
 // draw()
 /*******************************************************/
 function draw() {
-	background('pink');
 
+	if (gameState == "play"){
+		runGame();
+	}
+	else if (gameState == "lose"){
+		loseScreen();
+	}
+}
+
+/*******************************************************/
+// runGame()
+/*******************************************************/
+function runGame(){
+	background('pink');
+	if (random(0, 1000) < 10){
+		coins.add(createCoin());
+	}
     movePlayer();
-    checkCoinTime();
+	for (var i = 0; i < coins.length; i++){
+		// Check coin time, should return true if the coin is old and needs to be deleted
+		if (checkCoinTime(coins[i])){
+			coins[i].remove();
+			gameState = "lose"
+		}
+	}
+	console.log(gameState);
     displayScore();
 }
 
-function checkCoinTime(){
+/*******************************************************/
+// loseScreen()
+/*******************************************************/
+function loseScreen(){
+	background('red');
+	player.remove();
+	coins.remove();
+	fill(0, 0, 0);
+    textSize(40);
+    text("You missed a coin!", 10, 200);
+
+	text("Score: " + score, 10, 250);
+}
+
+/*******************************************************/
+// checkCoinTime()
+/*******************************************************/
+function checkCoinTime(_coin){
     //Check if the coin has been around too long (COIN_TIMEOUT milliseconds)
-    if (coin.spawntime + COIN_TIMEOUT < millis()){
-        coin.remove();
+    if (_coin.spawntime + COIN_TIMEOUT < millis()){
+		return(true); // Coin is old
     }
+	return(false); //Coin is young
 }
 
 /*****************************************************/
@@ -67,9 +111,10 @@ function displayScore(){
 // createCoin()
 /*******************************************************/
 function createCoin(){
-    coin = new Sprite(random(0, GAMEHEIGHT), random(0, GAMEHEIGHT), playerSize);
+    var coin = new Sprite(random(0, GAMEHEIGHT), random(0, GAMEHEIGHT), playerSize);
     coin.color = 'yellow';
     coin.spawntime = millis();
+	return(coin);
 }
 
 /*******************************************************/
