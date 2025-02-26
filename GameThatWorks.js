@@ -11,7 +11,7 @@
 const GAMEWIDTH = 500;
 const GAMEHEIGHT = 500;
 
-const playerSize = 20;
+const playerSize = 40;
 const MOVEMENTSPEED = 10;
 var player;
 var score = 0;
@@ -20,13 +20,13 @@ const COINSIZE = 10;
 const COIN_TIMEOUT = 2000;
 var coin;
 
-var gameState = "play";
+var gameState = "start";
 
 function setup() {
 	console.log("setup: ");
-
 	cnv = new Canvas(GAMEWIDTH, GAMEHEIGHT);
-    player = new Sprite(100, 100, playerSize, playerSize);
+
+	player = new Sprite(100, 100, playerSize, playerSize, 'k');
     player.color = 'purple';
 
 	coins = new Group();
@@ -44,13 +44,32 @@ function setup() {
 // draw()
 /*******************************************************/
 function draw() {
-
 	if (gameState == "play"){
 		runGame();
+	}
+	else if (gameState == "start"){
+		startScreen();
 	}
 	else if (gameState == "lose"){
 		loseScreen();
 	}
+}
+
+/*******************************************************/
+// startScreen()
+/*******************************************************/
+function startScreen() {
+	player.remove();
+	coins.remove();
+}
+
+/*******************************************************/
+// start()
+/*******************************************************/
+function start() {
+	setup();
+	gameState = "play";
+	walls();
 }
 
 /*******************************************************/
@@ -111,10 +130,24 @@ function displayScore(){
 // createCoin()
 /*******************************************************/
 function createCoin(){
-    var coin = new Sprite(random(0, GAMEHEIGHT), random(0, GAMEHEIGHT), playerSize);
+    var coin = new Sprite(random(0, GAMEHEIGHT), random(0, GAMEHEIGHT), 30);
     coin.color = 'yellow';
     coin.spawntime = millis();
 	return(coin);
+}
+
+/*******************************************************/
+// walls()
+/*******************************************************/
+function walls(){
+	wallLH  = new Sprite(0, height/2, 8, height, 's');
+	wallRH  = new Sprite(500, height/2, 8, height, 's');
+	wallTop = new Sprite(250, 0, width, 8, 's');
+	wallBot = new Sprite(250, 500, width, 8, 's');
+	wallLH.color = 'black';
+	wallRH.color = 'purple';
+	wallTop.color = 'red';
+	wallBot.color = 'cyan';
 }
 
 /*******************************************************/

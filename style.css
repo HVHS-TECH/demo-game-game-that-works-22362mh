@@ -1,0 +1,22 @@
+body {
+    background-color: rgb(92, 156, 240);
+    color: white;
+}
+
+h1 {
+    font-size: 100px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 60px;
+    text-align: center;
+}
+
+button {
+    border-color: white;
+    background-color: white;
+    color: rgb(77, 64, 192);
+    font-size: 30px;
+    margin-left: 47%;
+}
