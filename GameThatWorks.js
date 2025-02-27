@@ -5,6 +5,15 @@
 /*******************************************************/
 
 /*******************************************************/
+// preload()
+/*******************************************************/
+	let playerImg;
+function preload(){
+	console.log("preload");
+	playerImg = loadImage("/assets/images/player_run.png");
+	cookieImage = loadImage("/assets/images/cookie.png");
+}
+/*******************************************************/
 // setup()
 /*******************************************************/
 
@@ -16,9 +25,9 @@ const MOVEMENTSPEED = 10;
 var player;
 var score = 0;
 
-const COINSIZE = 10;
-const COIN_TIMEOUT = 2000;
-var coin;
+const COOKIESIZE = 10;
+const COOKIE_TIMEOUT = 2000;
+var cookie;
 
 var gameState = "start";
 
@@ -26,14 +35,24 @@ function setup() {
 	console.log("setup: ");
 	cnv = new Canvas(GAMEWIDTH, GAMEHEIGHT);
 
-	player = new Sprite(100, 100, playerSize, playerSize, 'k');
+	player = new Sprite(100, 100, playerSize, playerSize, 'd');
     player.color = 'purple';
+	player.spriteSheet = playerImg;
+	player.anis.offset.x = 2;
+	player.anis.frameDelay = 3;
 
-	coins = new Group();
+	player.addAnis({
+		run: {row: 0, frames: 4}
+	});
+	player.changeAni('run');
 
-    coins.add(createCoin());
+	allSprites.pixelPerfect = true;
 
-    player.collides(coins, getPoint);
+	cookies = new Group();
+
+    cookies.add(createCookie());
+
+    player.collides(cookies, getPoint);
     function getPoint(collider1, collider2) {
         collider2.remove();
         score++;
@@ -44,6 +63,7 @@ function setup() {
 // draw()
 /*******************************************************/
 function draw() {
+	player.rotation = 0;
 	if (gameState == "play"){
 		runGame();
 	}
@@ -55,12 +75,17 @@ function draw() {
 	}
 }
 
+function update(){
+	clear();
+	if (kb.presses('d')) player.changeAni('run');
+}
+
 /*******************************************************/
 // startScreen()
 /*******************************************************/
 function startScreen() {
 	player.remove();
-	coins.remove();
+	cookies.remove();
 }
 
 /*******************************************************/
@@ -78,13 +103,13 @@ function start() {
 function runGame(){
 	background('pink');
 	if (random(0, 1000) < 10){
-		coins.add(createCoin());
+		cookies.add(createCookie());
 	}
     movePlayer();
-	for (var i = 0; i < coins.length; i++){
-		// Check coin time, should return true if the coin is old and needs to be deleted
-		if (checkCoinTime(coins[i])){
-			coins[i].remove();
+	for (var i = 0; i < cookies.length; i++){
+		// Check cookie time, should return true if the cookie is old and needs to be deleted
+		if (checkCookieTime(cookies[i])){
+			cookies[i].remove();
 			gameState = "lose"
 		}
 	}
@@ -98,23 +123,23 @@ function runGame(){
 function loseScreen(){
 	background('red');
 	player.remove();
-	coins.remove();
+	cookies.remove();
 	fill(0, 0, 0);
     textSize(40);
-    text("You missed a coin!", 10, 200);
+    text("You missed a cookie!", 10, 200);
 
 	text("Score: " + score, 10, 250);
 }
 
 /*******************************************************/
-// checkCoinTime()
+// checkcookieTime()
 /*******************************************************/
-function checkCoinTime(_coin){
-    //Check if the coin has been around too long (COIN_TIMEOUT milliseconds)
-    if (_coin.spawntime + COIN_TIMEOUT < millis()){
-		return(true); // Coin is old
+function checkCookieTime(_cookie){
+    //Check if the cookie has been around too long (COOKIE_TIMEOUT milliseconds)
+    if (_cookie.spawntime + COOKIE_TIMEOUT < millis()){
+		return(true); // cookie is old
     }
-	return(false); //Coin is young
+	return(false); //cookie is young
 }
 
 /*****************************************************/
@@ -127,13 +152,14 @@ function displayScore(){
 }
 
 /*******************************************************/
-// createCoin()
+// createCookie()
 /*******************************************************/
-function createCoin(){
-    var coin = new Sprite(random(0, GAMEHEIGHT), random(0, GAMEHEIGHT), 30);
-    coin.color = 'yellow';
-    coin.spawntime = millis();
-	return(coin);
+function createCookie(){
+    var cookie = new Sprite(random(0, GAMEHEIGHT), random(0, GAMEHEIGHT), 40);
+    cookie.image = (cookieImage);
+	cookie.scale = 2;
+    cookie.spawntime = millis();
+	return(cookie);
 }
 
 /*******************************************************/
